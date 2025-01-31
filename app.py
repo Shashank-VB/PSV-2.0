@@ -18,7 +18,9 @@ def add_entry():
         'aadt_value': 0,
         'per_hgvs': 0,
         'year': 0,
-        'lanes': 1
+        'lanes': 1,
+        'il_value': 0,
+        'site_category': ""
     })
 
 # Button to add new entries
@@ -31,6 +33,8 @@ for idx, entry in enumerate(st.session_state.entries):
         entry['per_hgvs'] = st.number_input(f"Enter % of HGVs for Entry {idx+1}:", key=f"per_hgvs_{idx}")
         entry['year'] = st.number_input(f"Enter Year for Entry {idx+1}:", min_value=0, key=f"year_{idx}")
         entry['lanes'] = st.number_input(f"Enter number of lanes for Entry {idx+1}:", min_value=1, key=f"lanes_{idx}")
+        entry['il_value'] = st.number_input(f"Enter IL value for Entry {idx+1}:", key=f"il_value_{idx}")
+        entry['site_category'] = st.text_input(f"Enter Site Category for Entry {idx+1}:", key=f"site_category_{idx}")
 
 # Calculation Function
 def calculate_psv(aadt_value, per_hgvs, year, lanes):
@@ -86,8 +90,8 @@ if uploaded_file is not None:
         st.write(f"Lane Details Lane4: {lane_details_lane4}")
 
         # Now calculate PSV for each lane from the Excel sheet
-        value1 = entry['aadt_value']
-        value2 = entry['per_hgvs']
+        value1 = entry['site_category']
+        value2 = entry['il_value']
         value3 = lane_details_lane1
         value4 = lane_details_lane2
         value5 = lane_details_lane3
