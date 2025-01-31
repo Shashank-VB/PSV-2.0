@@ -1,3 +1,19 @@
+import streamlit as st
+import streamlit as st
+import pandas as pd
+import math
+
+# Your other imports and code here
+
+# Initialize session state for entries if it doesn't exist
+if 'entries' not in st.session_state:
+    st.session_state.entries = []
+
+# The rest of your code continues...
+
+
+
+
 # Initialize session state for entries if it doesn't exist
 if 'entries' not in st.session_state:
     st.session_state.entries = []
