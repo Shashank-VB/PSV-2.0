@@ -75,7 +75,7 @@ def calculate_psv(aadt_value, per_hgvs, year, lanes):
             lane1 = 54
             lane2 = 100 - 54
         lane_details_lane1 =  math.ceil(total_projected_aadt_hgvs * (lane1 / 100))
-        lane_details_lane2 =  math.ceild(total_projected_aadt_hgvs * (lane2 / 100))
+        lane_details_lane2 =  math.ceil(total_projected_aadt_hgvs * (lane2 / 100))
     elif lanes >= 4:
         if total_projected_aadt_hgvs <= 10500:
             lane1 =  math.ceil(100 - (0.0036 * total_projected_aadt_hgvs))
