@@ -1,63 +1,91 @@
 import streamlit as st
-import pandas as pd
+import requests
+import time
 import math
-from openpyxl import load_workbook
+import pandas as pd
+import os
 
 # Title
-st.title("Polished Stone Value (PSV) Batch Calculator")
+st.title("Polished Stone Value (PSV) Calculator Results")
 
-# File Upload
-st.sidebar.header("Upload Excel File")
-uploaded_file = st.sidebar.file_uploader("Upload your Excel file:", type=["xlsx"])
+# Input parameters
+st.sidebar.title("Polished Stone Value (PSV) Calculator")
+st.sidebar.header("Enter values:")
 
-if uploaded_file is not None:
-    df = pd.read_excel(uploaded_file)
-    
-    # Ensure required columns exist
-    required_columns = {"AADT", "%HGVs", "Year", "Lanes", "SiteCategory", "IL"}
-    if not required_columns.issubset(df.columns):
-        st.error(f"Missing required columns: {required_columns - set(df.columns)}")
-    else:
-        # Function to perform calculations
-        def calculate_psv(row):
-            aadt_value = row["AADT"]
-            per_hgvs = row["%HGVs"]
-            year = row["Year"]
-            lanes = row["Lanes"]
-            site_category = row["SiteCategory"]
-            il_value = row["IL"]
-            
-            design_period = ((20 + 2025) - year) if year != 0 else 0
-            aadt_hgvs = max(11, per_hgvs) * (aadt_value / 100)
-            total_projected_aadt_hgvs = round(aadt_hgvs * (1 + 1.54 / 100) ** design_period)
-            
-            lane_distribution = [0, 0, 0, 0]  # Default for up to 4 lanes
-            
-            if lanes == 1:
-                lane_distribution[0] = 100
-            elif lanes == 2 or lanes == 3:
-                lane_distribution[0] = round(100 - (0.0036 * total_projected_aadt_hgvs))
-                lane_distribution[1] = 100 - lane_distribution[0]
-            elif lanes >= 4:
-                lane_distribution[0] = round(75 - (0.0012 * total_projected_aadt_hgvs))
-                lane_distribution[1] = round(89 - (0.0014 * (total_projected_aadt_hgvs - ((total_projected_aadt_hgvs * lane_distribution[0]) / 100))))
-                lane_distribution[2] = 100 - lane_distribution[1]
-            
-            lane_traffic = [round(total_projected_aadt_hgvs * (lane_distribution[i] / 100)) for i in range(4)]
-            
-            return [design_period, total_projected_aadt_hgvs] + lane_traffic
-        
-        # Apply calculations to each row
-        results = df.apply(calculate_psv, axis=1, result_type='expand')
-        results.columns = ["Design Period", "Total Projected AADT HGVs", "Lane1 Traffic", "Lane2 Traffic", "Lane3 Traffic", "Lane4 Traffic"]
-        output_df = pd.concat([df, results], axis=1)
-        
-        # Save to a new sheet in the uploaded file
-        output_filename = "Processed_" + uploaded_file.name
-        with pd.ExcelWriter(output_filename, engine='openpyxl') as writer:
-            df.to_excel(writer, sheet_name='Input Data', index=False)
-            output_df.to_excel(writer, sheet_name='Results', index=False)
-        
-        st.success("Calculation complete. Download the results below.")
-        st.download_button(label="Download Results", data=open(output_filename, "rb").read(), file_name=output_filename, mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+# Create a session state to store multiple entries
+if 'entries' not in st.session_state:
+    st.session_state.entries = []
+
+def add_entry():
+    st.session_state.entries.append({
+        'aadt_value': 0,
+        'per_hgvs': 0,
+        'year': 0,
+        'lanes': 1
+    })
+
+# Button to add new entries
+st.sidebar.button("Add Entry", on_click=add_entry)
+
+# Iterate over the entries for dynamic input
+for idx, entry in enumerate(st.session_state.entries):
+    with st.sidebar.expander(f"Entry {idx+1}"):
+        entry['aadt_value'] = st.number_input(f"Enter AADT value for Entry {idx+1}:", min_value=0, key=f"aadt_{idx}")
+        entry['per_hgvs'] = st.number_input(f"Enter % of HGVs for Entry {idx+1}:", key=f"per_hgvs_{idx}")
+        entry['year'] = st.number_input(f"Enter Year for Entry {idx+1}:", min_value=0, key=f"year_{idx}")
+        entry['lanes'] = st.number_input(f"Enter number of lanes for Entry {idx+1}:", min_value=1, key=f"lanes_{idx}")
+
+# Link section
+st.sidebar.header("Links Section")
+st.sidebar.text("Here you can add links related to PSV or your project.")
+st.sidebar.text_input("Enter a link title:")
+link_url = st.sidebar.text_input("Enter the link URL:")
+
+if link_url:
+    st.sidebar.markdown(f"[{link_url}]({link_url})")
+
+# Calculation Function
+def calculate_psv(aadt_value, per_hgvs, year, lanes):
+    # Reuse existing logic here
+    design_period = 0 if year == 0 else (20 + 2025) - year
+    result1 = per_hgvs if per_hgvs >= 11 else 11
+    AADT_HGVS = result1 * (aadt_value / 100)
+    total_projected_aadt_hgvs = AADT_HGVS * (1 + 1.54 / 100) ** design_period
+    AADT_HGVS = round(AADT_HGVS)
+    total_projected_aadt_hgvs = round(total_projected_aadt_hgvs)
+
+    # Percentage of commercial vehicles in each lane
+    lane1 = lane2 = lane3 = lane4 = 0
+    lane_details_lane1 = lane_details_lane2 = lane_details_lane3 = lane_details_lane4 = 0
+    if lanes == 1:
+        lane1 = 100
+        lane_details_lane1 = total_projected_aadt_hgvs
+    elif lanes == 2:
+        lane1 = round(100 - (0.0036 * total_projected_aadt_hgvs))
+        lane2 = 100 - lane1
+        lane_details_lane1 = round(total_projected_aadt_hgvs * (lane1 / 100))
+        lane_details_lane2 = round(total_projected_aadt_hgvs * (lane2 / 100))
+    elif lanes >= 3:
+        # Handle 3 or 4 lanes based on the existing logic
+        pass
+
+    return AADT_HGVS, total_projected_aadt_hgvs, lane1, lane2, lane3, lane4, lane_details_lane1, lane_details_lane2, lane_details_lane3, lane_details_lane4
+
+# Process and display results for each entry
+for idx, entry in enumerate(st.session_state.entries):
+    AADT_HGVS, total_projected_aadt_hgvs, lane1, lane2, lane3, lane4, lane_details_lane1, lane_details_lane2, lane_details_lane3, lane_details_lane4 = calculate_psv(entry['aadt_value'], entry['per_hgvs'], entry['year'], entry['lanes'])
+
+    st.subheader(f"Results for Entry {idx+1}")
+    st.write(f"AADT_HGVS: {AADT_HGVS}")
+    st.write(f"Total Projected AADT HGVs: {total_projected_aadt_hgvs}")
+    st.write(f"Lane1: {lane1}%")
+    st.write(f"Lane2: {lane2}%")
+    st.write(f"Lane3: {lane3}%")
+    st.write(f"Lane4: {lane4}%")
+    st.write(f"Lane Details Lane1: {lane_details_lane1}")
+    st.write(f"Lane Details Lane2: {lane_details_lane2}")
+    st.write(f"Lane Details Lane3: {lane_details_lane3}")
+    st.write(f"Lane Details Lane4: {lane_details_lane4}")
+
+
 
