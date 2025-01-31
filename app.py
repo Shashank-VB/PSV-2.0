@@ -2,12 +2,23 @@ import streamlit as st
 import pandas as pd
 import math
 
-df.columns = df.columns.str.strip()  # Remove any extra spaces from column names
-
 
 # Function to calculate the AADT for each lane
 def roundup(value):
     return math.ceil(value)
+    
+if uploaded_file is not None:
+    # Read the Excel file into a DataFrame
+    df = pd.read_excel(uploaded_file)
+    
+    # Clean up column names by removing leading/trailing spaces
+    df.columns = df.columns.str.strip()  # This line removes any extra spaces from column names
+    
+    # Display the DataFrame (optional, for debugging)
+    st.write(df)
+    
+    # Proceed with your calculation logic
+    report_df = calculate_psv(df, psv_df)
 
 # Function to perform PSV calculation based on input data
 def calculate_psv(df, psv_df):
