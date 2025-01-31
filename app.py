@@ -48,6 +48,7 @@ def calculate_psv(aadt_value, per_hgvs, year, lanes):
     # Percentage of commercial vehicles in each lane
     lane1 = lane2 = lane3 = lane4 = 0
     lane_details_lane1 = lane_details_lane2 = lane_details_lane3 = lane_details_lane4 = 0
+
     if lanes == 1:
         lane1 = 100
         lane_details_lane1 = total_projected_aadt_hgvs
@@ -56,9 +57,46 @@ def calculate_psv(aadt_value, per_hgvs, year, lanes):
         lane2 = 100 - lane1
         lane_details_lane1 = round(total_projected_aadt_hgvs * (lane1 / 100))
         lane_details_lane2 = round(total_projected_aadt_hgvs * (lane2 / 100))
-    elif lanes >= 3:
-        # Handle 3 or 4 lanes based on the existing logic
-        pass
+    elif lanes == 3:
+        # For 3 lanes calculation logic
+        if total_projected_aadt_hgvs < 5000:
+            lane1 = round(100 - (0.0036 * total_projected_aadt_hgvs))
+            lane2 = 100 - lane1
+            lane3 = 0
+        elif 5000 <= total_projected_aadt_hgvs < 25000:
+            lane1 = round(89 - (0.0014 * total_projected_aadt_hgvs))
+            lane2 = round(100 - lane1)
+            lane3 = 0
+        elif total_projected_aadt_hgvs >= 25000:
+            lane1 = 54
+            lane2 = 46
+            lane3 = 0
+        lane_details_lane1 = round(total_projected_aadt_hgvs * (lane1 / 100))
+        lane_details_lane2 = round(total_projected_aadt_hgvs * (lane2 / 100))
+        lane_details_lane3 = total_projected_aadt_hgvs - (lane_details_lane1 + lane_details_lane2)
+    elif lanes == 4:
+        # For 4 lanes calculation logic
+        if total_projected_aadt_hgvs <= 10500:
+            lane1 = round(100 - (0.0036 * total_projected_aadt_hgvs))
+            lane_2_3 = (total_projected_aadt_hgvs - ((total_projected_aadt_hgvs * lane1) / 100))
+            lane2 = round(89 - (0.0014 * lane_2_3))
+            lane3 = 100 - lane2
+            lane4 = 0
+        elif 10500 < total_projected_aadt_hgvs <= 25000:
+            lane1 = round(75 - (0.0012 * total_projected_aadt_hgvs))
+            lane_2_3 = (total_projected_aadt_hgvs - ((total_projected_aadt_hgvs * lane1) / 100))
+            lane2 = round(89 - (0.0014 * lane_2_3))
+            lane3 = 100 - lane2
+            lane4 = 0
+        else:
+            lane1 = 45
+            lane2 = 54
+            lane3 = 100 - lane2
+            lane4 = 0
+
+        lane_details_lane1 = round(total_projected_aadt_hgvs * (lane1 / 100))
+        lane_details_lane2 = round((total_projected_aadt_hgvs - lane_details_lane1) * (lane2 / 100))
+        lane_details_lane3 = total_projected_aadt_hgvs - (lane_details_lane1 + lane_details_lane2)
 
     return AADT_HGVS, total_projected_aadt_hgvs, lane1, lane2, lane3, lane4, lane_details_lane1, lane_details_lane2, lane_details_lane3, lane_details_lane4
 
