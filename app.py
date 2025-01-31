@@ -1,4 +1,12 @@
-# Replace the original button with unique keys for each entry in the loop
+# Initialize session state for entries if it doesn't exist
+if 'entries' not in st.session_state:
+    st.session_state.entries = []
+
+# Add a new entry for each form submission
+if st.sidebar.button("Add Entry"):
+    st.session_state.entries.append({'aadt_value': 0, 'per_hgvs': 0, 'year': 0, 'lanes': 1, 'il_value': 0, 'site_category': ""})
+
+# Loop over the entries to show input fields and process them
 for idx, entry in enumerate(st.session_state.entries):
     with st.sidebar.expander(f"Entry {idx+1}"):
         entry['aadt_value'] = st.number_input(f"Enter AADT value for Entry {idx+1}:", min_value=0, key=f"aadt_{idx}")
