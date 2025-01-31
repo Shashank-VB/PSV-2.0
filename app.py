@@ -8,7 +8,7 @@ st.title("Polished Stone Value (PSV) Calculator Results")
 # Sidebar for inputs
 st.sidebar.title("Polished Stone Value (PSV) Calculator")
 st.sidebar.header("Enter values:")
-entry_number = st.sidebar.number_input("Enter Entry Number:", min_value=1)  # Allow custom entry number
+link_section_number = st.sidebar.text_input("Enter Link Section Number:", "")  # Allow any characters
 aadt_value = st.sidebar.number_input("Enter AADT value:", min_value=0)
 per_hgvs = st.sidebar.number_input("Enter % of HGVs:")
 year = st.sidebar.number_input("Enter Year", min_value=0)
@@ -22,16 +22,19 @@ if 'entries' not in st.session_state:
 
 # Add Entry button to add more entries
 if st.sidebar.button("Add Entry"):
-    # Store entry with custom entry number
-    entry_data = {
-        'aadt_value': aadt_value,
-        'per_hgvs': per_hgvs,
-        'year': year,
-        'lanes': lanes,
-        'il_value': il_value,
-        'site_category': site_category
-    }
-    st.session_state.entries[entry_number] = entry_data
+    # Store entry with custom link section number as the key
+    if link_section_number:
+        entry_data = {
+            'aadt_value': aadt_value,
+            'per_hgvs': per_hgvs,
+            'year': year,
+            'lanes': lanes,
+            'il_value': il_value,
+            'site_category': site_category
+        }
+        st.session_state.entries[link_section_number] = entry_data
+    else:
+        st.error("Please enter a valid link section number.")
 
 # Excel file uploader for PSV values
 st.sidebar.header("Upload PSV Excel File")
@@ -95,8 +98,8 @@ def calculate_psv(aadt_value, per_hgvs, year, lanes):
     return AADT_HGVS, total_projected_aadt_hgvs, lane1, lane2, lane3, lane4, lane_details_lane1, lane_details_lane2, lane_details_lane3, lane_details_lane4
 
 # Loop over each entry and calculate results
-for entry_number, entry in st.session_state.entries.items():
-    with st.expander(f"Entry {entry_number}"):
+for link_section_number, entry in st.session_state.entries.items():
+    with st.expander(f"Link Section: {link_section_number}"):
         AADT_HGVS, total_projected_aadt_hgvs, lane1, lane2, lane3, lane4, lane_details_lane1, lane_details_lane2, lane_details_lane3, lane_details_lane4 = calculate_psv(
             entry['aadt_value'], entry['per_hgvs'], entry['year'], entry['lanes']
         )
