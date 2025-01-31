@@ -1,32 +1,4 @@
-import streamlit as st
-import math
-import pandas as pd
-
-# Title
-st.title("Polished Stone Value (PSV) Calculator Results")
-
-# Input parameters
-st.sidebar.title("Polished Stone Value (PSV) Calculator")
-st.sidebar.header("Enter values:")
-
-# Create a session state to store multiple entries
-if 'entries' not in st.session_state:
-    st.session_state.entries = []
-
-def add_entry():
-    st.session_state.entries.append({
-        'aadt_value': 0,
-        'per_hgvs': 0,
-        'year': 0,
-        'lanes': 1,
-        'il_value': 0,
-        'site_category': ""
-    })
-
-# Button to add new entries
-st.sidebar.button("Add Entry", on_click=add_entry)
-
-# Iterate over the entries for dynamic input
+# Replace the original button with unique keys for each entry in the loop
 for idx, entry in enumerate(st.session_state.entries):
     with st.sidebar.expander(f"Entry {idx+1}"):
         entry['aadt_value'] = st.number_input(f"Enter AADT value for Entry {idx+1}:", min_value=0, key=f"aadt_{idx}")
@@ -36,83 +8,8 @@ for idx, entry in enumerate(st.session_state.entries):
         entry['il_value'] = st.number_input(f"Enter IL value for Entry {idx+1}:", key=f"il_value_{idx}")
         entry['site_category'] = st.text_input(f"Enter Site Category for Entry {idx+1}:", key=f"site_category_{idx}")
 
-# Calculation Function
-def calculate_psv(aadt_value, per_hgvs, year, lanes):
-    design_period = 0 if year == 0 else (20 + 2025) - year
-    result1 = per_hgvs if per_hgvs >= 11 else 11
-    AADT_HGVS = result1 * (aadt_value / 100)
-    total_projected_aadt_hgvs = AADT_HGVS * (1 + 1.54 / 100) ** design_period
-    AADT_HGVS = round(AADT_HGVS)
-    total_projected_aadt_hgvs = round(total_projected_aadt_hgvs)
-
-    # Percentage of commercial vehicles in each lane
-    lane1 = lane2 = lane3 = lane4 = 0
-    lane_details_lane1 = lane_details_lane2 = lane_details_lane3 = lane_details_lane4 = 0
-
-    if lanes == 1:
-        lane1 = 100
-        lane_details_lane1 = total_projected_aadt_hgvs
-    elif lanes == 2:
-        lane1 = round(100 - (0.0036 * total_projected_aadt_hgvs))
-        lane2 = 100 - lane1
-        lane_details_lane1 = round(total_projected_aadt_hgvs * (lane1 / 100))
-        lane_details_lane2 = round(total_projected_aadt_hgvs * (lane2 / 100))
-    elif lanes == 3:
-        # For 3 lanes calculation logic
-        if total_projected_aadt_hgvs < 5000:
-            lane1 = round(100 - (0.0036 * total_projected_aadt_hgvs))
-            lane2 = 100 - lane1
-            lane3 = 0
-        elif 5000 <= total_projected_aadt_hgvs < 25000:
-            lane1 = round(89 - (0.0014 * total_projected_aadt_hgvs))
-            lane2 = round(100 - lane1)
-            lane3 = 0
-        elif total_projected_aadt_hgvs >= 25000:
-            lane1 = 54
-            lane2 = 46
-            lane3 = 0
-        lane_details_lane1 = round(total_projected_aadt_hgvs * (lane1 / 100))
-        lane_details_lane2 = round(total_projected_aadt_hgvs * (lane2 / 100))
-        lane_details_lane3 = total_projected_aadt_hgvs - (lane_details_lane1 + lane_details_lane2)
-    elif lanes == 4:
-        # For 4 lanes calculation logic
-        if total_projected_aadt_hgvs <= 10500:
-            lane1 = round(100 - (0.0036 * total_projected_aadt_hgvs))
-            lane_2_3 = (total_projected_aadt_hgvs - ((total_projected_aadt_hgvs * lane1) / 100))
-            lane2 = round(89 - (0.0014 * lane_2_3))
-            lane3 = 100 - lane2
-            lane4 = 0
-        elif 10500 < total_projected_aadt_hgvs <= 25000:
-            lane1 = round(75 - (0.0012 * total_projected_aadt_hgvs))
-            lane_2_3 = (total_projected_aadt_hgvs - ((total_projected_aadt_hgvs * lane1) / 100))
-            lane2 = round(89 - (0.0014 * lane_2_3))
-            lane3 = 100 - lane2
-            lane4 = 0
-        else:
-            lane1 = 45
-            lane2 = 54
-            lane3 = 100 - lane2
-            lane4 = 0
-
-        lane_details_lane1 = round(total_projected_aadt_hgvs * (lane1 / 100))
-        lane_details_lane2 = round((total_projected_aadt_hgvs - lane_details_lane1) * (lane2 / 100))
-        lane_details_lane3 = total_projected_aadt_hgvs - (lane_details_lane1 + lane_details_lane2)
-
-    return AADT_HGVS, total_projected_aadt_hgvs, lane1, lane2, lane3, lane4, lane_details_lane1, lane_details_lane2, lane_details_lane3, lane_details_lane4
-
-# Load and read the Excel file
-st.sidebar.header("Upload CD 236 Excel file with table")
-uploaded_file = st.sidebar.file_uploader("Upload your Excel file:", type=["xlsx"])
-
-if uploaded_file is not None:
-    df = pd.read_excel(uploaded_file)
-
-    # Display the data in the uploaded Excel file
-    st.write("Uploaded Table")
-    st.write(df)
-
-    # For each entry, calculate PSV values based on the Excel data
-    for idx, entry in enumerate(st.session_state.entries):
+    # Ensure the button has a unique key for each entry
+    if st.sidebar.button(f"Search PSV for Entry {idx+1}", key=f"search_psv_{idx}"):
         AADT_HGVS, total_projected_aadt_hgvs, lane1, lane2, lane3, lane4, lane_details_lane1, lane_details_lane2, lane_details_lane3, lane_details_lane4 = calculate_psv(entry['aadt_value'], entry['per_hgvs'], entry['year'], entry['lanes'])
 
         st.subheader(f"Results for Entry {idx+1}")
@@ -135,64 +32,62 @@ if uploaded_file is not None:
         value5 = lane_details_lane3
         
         # Search and match the PSV values from the Excel sheet for each lane
-        if st.sidebar.button("Search PSV"):
-            # For Lane 1
+        range_column = None
+        for col in df.columns:
+            if '-' in col:
+                col_range = list(map(int, col.split('-')))
+                if col_range[0] <= value3 <= col_range[1]:
+                    range_column = col
+                    break
+        if range_column:
+            filtered_df = df[(df['SiteCategory'] == value1) & (df['IL'] == value2)]
+            if not filtered_df.empty:
+                result = filtered_df.iloc[0][range_column]
+            else:
+                result = "No matching result found."
+        else:
+            result = "No matching range found for the given value."
+
+        st.write(f"PSV at Lane1: {result}")
+        
+        # For Lane 2
+        if value4 == 0:
+            st.write(f"Lane2: NA")
+        else:
             range_column = None
             for col in df.columns:
                 if '-' in col:
                     col_range = list(map(int, col.split('-')))
-                    if col_range[0] <= value3 <= col_range[1]:
+                    if col_range[0] <= value4 <= col_range[1]:
                         range_column = col
                         break
             if range_column:
                 filtered_df = df[(df['SiteCategory'] == value1) & (df['IL'] == value2)]
                 if not filtered_df.empty:
-                    result = filtered_df.iloc[0][range_column]
+                    result2 = filtered_df.iloc[0][range_column]
                 else:
-                    result = "No matching result found."
+                    result2 = "No matching result found."
             else:
-                result = "No matching range found for the given value."
+                result2 = "No matching range found for the given value."
+            st.write(f"PSV at Lane2: {result2}")
 
-            st.write(f"PSV at Lane1: {result}")
-            
-            # For Lane 2
-            if value4 == 0:
-                st.write(f"Lane2: NA")
-            else:
-                range_column = None
-                for col in df.columns:
-                    if '-' in col:
-                        col_range = list(map(int, col.split('-')))
-                        if col_range[0] <= value4 <= col_range[1]:
-                            range_column = col
-                            break
-                if range_column:
-                    filtered_df = df[(df['SiteCategory'] == value1) & (df['IL'] == value2)]
-                    if not filtered_df.empty:
-                        result2 = filtered_df.iloc[0][range_column]
-                    else:
-                        result2 = "No matching result found."
+        # For Lane 3
+        if value5 == 0:
+            st.write(f"Lane3: NA")
+        else:
+            range_column = None
+            for col in df.columns:
+                if '-' in col:
+                    col_range = list(map(int, col.split('-')))
+                    if col_range[0] <= value5 <= col_range[1]:
+                        range_column = col
+                        break
+            if range_column:
+                filtered_df = df[(df['SiteCategory'] == value1) & (df['IL'] == value2)]
+                if not filtered_df.empty:
+                    result3 = filtered_df.iloc[0][range_column]
                 else:
-                    result2 = "No matching range found for the given value."
-                st.write(f"PSV at Lane2: {result2}")
-
-            # For Lane 3
-            if value5 == 0:
-                st.write(f"Lane3: NA")
+                    result3 = "No matching result found."
             else:
-                range_column = None
-                for col in df.columns:
-                    if '-' in col:
-                        col_range = list(map(int, col.split('-')))
-                        if col_range[0] <= value5 <= col_range[1]:
-                            range_column = col
-                            break
-                if range_column:
-                    filtered_df = df[(df['SiteCategory'] == value1) & (df['IL'] == value2)]
-                    if not filtered_df.empty:
-                        result3 = filtered_df.iloc[0][range_column]
-                    else:
-                        result3 = "No matching result found."
-                else:
-                    result3 = "No matching range found for the given value."
-                st.write(f"PSV at Lane3: {result3}")
+                result3 = "No matching range found for the given value."
+            st.write(f"PSV at Lane3: {result3}")
