@@ -2,6 +2,9 @@ import streamlit as st
 import pandas as pd
 import math
 
+df.columns = df.columns.str.strip()  # Remove any extra spaces from column names
+
+
 # Function to calculate the AADT for each lane
 def roundup(value):
     return math.ceil(value)
