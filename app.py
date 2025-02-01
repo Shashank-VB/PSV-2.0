@@ -53,6 +53,7 @@ def calculate_psv(aadt_value, per_hgvs, year, lanes):
     lane_details_lane1 = lane_details_lane2 = lane_details_lane3 = lane_details_lane4 = 0
     design_period = 0 if year == 0 else ((20 + 2025) - year)
     
+    
     # Calculate AADT of HGVS
     result1 = per_hgvs if per_hgvs >= 11 else 11
     AADT_HGVS = (result1 * (aadt_value / 100))
@@ -60,12 +61,7 @@ def calculate_psv(aadt_value, per_hgvs, year, lanes):
     AADT_HGVS = round(AADT_HGVS)
     total_projected_aadt_hgvs = round(total_projected_aadt_hgvs)
     
-    st.subheader("Generic")
-# Generic Results
-st.write("AADT_HGVS:", AADT_HGVS)
-st.write("Design Period in years", design_period)
-st.write("Total Projected AADT OF HGVs", total_projected_aadt_hgvs)
-
+  
     # percentage of commercial vehicles in each lane
     if lanes == 1:
         lane1 = 100
@@ -109,25 +105,19 @@ for link_section_number, entry in st.session_state.entries.items():
         AADT_HGVS, total_projected_aadt_hgvs, lane1, lane2, lane3, lane4, lane_details_lane1, lane_details_lane2, lane_details_lane3, lane_details_lane4 = calculate_psv(
             entry['aadt_value'], entry['per_hgvs'], entry['year'], entry['lanes']
         )
-st.subheader("Percentage of CV's in each lane")
-st.write("Lane1:", lane1)
-st.write("Lane2:", lane2)
-st.write("Lane3:", lane3)
-st.write("Lane4:", lane4)
-
-#Design Traffic
-st.subheader("Design Traffic")
-st.write("Lane Details Lane1:", lane_details_lane1)
-st.write("Lane Details Lane2:", lane_details_lane2)
-st.write("Lane Details Lane3:", lane_details_lane3)
-st.write("Lane Details Lane4:", lane_details_lane4)
-
+ st.subheader("Generic")
+   # Generic Results
+        
         st.write(f"AADT_HGVS: {AADT_HGVS}")
+        st.write(f"Design Period in years", design_period)
         st.write(f"Total Projected AADT HGVs: {total_projected_aadt_hgvs}")
+   st.subheader("Percentage of CV's in each lane")
         st.write(f"Lane1: {lane1}%")
         st.write(f"Lane2: {lane2}%")
         st.write(f"Lane3: {lane3}%")
         st.write(f"Lane4: {lane4}%")
+#Design Traffic
+st.subheader("Design Traffic")
         st.write(f"Lane Details Lane1: {lane_details_lane1}")
         st.write(f"Lane Details Lane2: {lane_details_lane2}")
         st.write(f"Lane Details Lane3: {lane_details_lane3}")
@@ -160,6 +150,7 @@ st.write("Lane Details Lane4:", lane_details_lane4)
             else:
                 return "No matching range found for the given value."
 
+st.subheader("Min.PSV Values at each lane")
         st.write(f"PSV at Lane1: {get_psv_for_lane(df, value1, value2, value3)}")
         st.write(f"PSV at Lane2: {get_psv_for_lane(df, value1, value2, value4)}")
         st.write(f"PSV at Lane3: {get_psv_for_lane(df, value1, value2, value5)}")
