@@ -64,7 +64,7 @@ st.subheader("Generic")
 # Generic Results
 st.write("AADT_HGVS:", AADT_HGVS)
 st.write("Design Period in years", design_period)
-st.write("Total Projected AADT HGVs", total_projected_aadt_hgvs)
+st.write("Total Projected AADT OF HGVs", total_projected_aadt_hgvs)
     
     # Lane percentage calculation
     if lanes == 1:
