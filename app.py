@@ -100,8 +100,8 @@ def get_psv_for_lane(df, value1, value2, lane_value):
         return "NA"
     range_column = None
     for col in df.columns:
-        if '-' in col:
-            col_range = list(map(int, col.split('-')))
+        if '-' in str(col):
+            col_range = list(map(int, str(col).split('-')))
             if col_range[0] <= lane_value <= col_range[1]:
                 range_column = col
                 break
@@ -121,12 +121,13 @@ for link_section_number, entry in st.session_state.entries.items():
             entry['aadt_value'], entry['per_hgvs'], entry['year'], entry['lanes']
         )
         
-        st.subheader("Generic")
         # Generic Results
+        st.subheader("Generic")
         st.write(f"AADT_HGVS: {AADT_HGVS}")
         st.write(f"Design Period in years: {design_period}")
         st.write(f"Total Projected AADT HGVs: {total_projected_aadt_hgvs}")
 
+        # Percentage of CV's in each lane
         st.subheader("Percentage of CV's in each lane")
         st.write(f"Lane1: {lane1}%")
         st.write(f"Lane2: {lane2}%")
@@ -140,6 +141,7 @@ for link_section_number, entry in st.session_state.entries.items():
         st.write(f"Lane Details Lane3: {lane_details_lane3}")
         st.write(f"Lane Details Lane4: {lane_details_lane4}")
 
+        # PSV Values
         if uploaded_file is not None:
             st.subheader("Min.PSV Values at each lane")
             st.write(f"PSV at Lane1: {get_psv_for_lane(df, entry['site_category'], entry['il_value'], lane_details_lane1)}")
