@@ -105,23 +105,25 @@ for link_section_number, entry in st.session_state.entries.items():
         AADT_HGVS, total_projected_aadt_hgvs, lane1, lane2, lane3, lane4, lane_details_lane1, lane_details_lane2, lane_details_lane3, lane_details_lane4 = calculate_psv(
             entry['aadt_value'], entry['per_hgvs'], entry['year'], entry['lanes']
         )
- st.subheader("Generic")
-   # Generic Results
         
-        st.write(f"AADT_HGVS: {AADT_HGVS}")
-        st.write(f"Design Period in years", design_period)
-        st.write(f"Total Projected AADT HGVs: {total_projected_aadt_hgvs}")
-   st.subheader("Percentage of CV's in each lane")
-        st.write(f"Lane1: {lane1}%")
-        st.write(f"Lane2: {lane2}%")
-        st.write(f"Lane3: {lane3}%")
-        st.write(f"Lane4: {lane4}%")
-#Design Traffic
+st.subheader("Generic")
+# Generic Results
+st.write(f"AADT_HGVS: {AADT_HGVS}")
+st.write(f"Design Period in years: {design_period}")
+st.write(f"Total Projected AADT HGVs: {total_projected_aadt_hgvs}")
+
+st.subheader("Percentage of CV's in each lane")
+st.write(f"Lane1: {lane1}%")
+st.write(f"Lane2: {lane2}%")
+st.write(f"Lane3: {lane3}%")
+st.write(f"Lane4: {lane4}%")
+
+# Design Traffic
 st.subheader("Design Traffic")
-        st.write(f"Lane Details Lane1: {lane_details_lane1}")
-        st.write(f"Lane Details Lane2: {lane_details_lane2}")
-        st.write(f"Lane Details Lane3: {lane_details_lane3}")
-        st.write(f"Lane Details Lane4: {lane_details_lane4}")
+st.write(f"Lane Details Lane1: {lane_details_lane1}")
+st.write(f"Lane Details Lane2: {lane_details_lane2}")
+st.write(f"Lane Details Lane3: {lane_details_lane3}")
+st.write(f"Lane Details Lane4: {lane_details_lane4}")
 
         # Now calculate PSV for each lane from the uploaded Excel file
         value1 = entry['site_category']
