@@ -102,11 +102,9 @@ def calculate_psv(aadt_value, per_hgvs, year, lanes):
 # Loop over each entry and calculate results
 for link_section_number, entry in st.session_state.entries.items():
     with st.expander(f"Link Section: {link_section_number}"):
-       AADT_HGVS, total_projected_aadt_hgvs, lane1, lane2, lane3, lane4, lane_details_lane1, lane_details_lane2, lane_details_lane3, lane_details_lane4 = calculate_psv(
-    entry['aadt_value'], entry['per_hgvs'], entry['year'], entry['lanes']
-)
-design_period = (20 + 2025) - entry['year'] if entry['year'] > 0 else 0
-
+        AADT_HGVS, total_projected_aadt_hgvs, lane1, lane2, lane3, lane4, lane_details_lane1, lane_details_lane2, lane_details_lane3, lane_details_lane4 = calculate_psv(
+            entry['aadt_value'], entry['per_hgvs'], entry['year'], entry['lanes']
+        )
         
 st.subheader("Generic")
 # Generic Results
@@ -155,7 +153,6 @@ st.write(f"Lane Details Lane4: {lane_details_lane4}")
                 return "No matching range found for the given value."
 
 st.subheader("Min.PSV Values at each lane")
-st.write(f"PSV at Lane1: {get_psv_for_lane(df, value1, value2, value3)}")
-st.write(f"PSV at Lane2: {get_psv_for_lane(df, value1, value2, value4)}")
-st.write(f"PSV at Lane3: {get_psv_for_lane(df, value1, value2, value5)}")
-
+        st.write(f"PSV at Lane1: {get_psv_for_lane(df, value1, value2, value3)}")
+        st.write(f"PSV at Lane2: {get_psv_for_lane(df, value1, value2, value4)}")
+        st.write(f"PSV at Lane3: {get_psv_for_lane(df, value1, value2, value5)}")
