@@ -21,7 +21,7 @@ if 'entries' not in st.session_state:
     st.session_state.entries = {}
 
 # Add Entry button to add more entries
-if st.sidebar.button("Add Entry"):
+if st.sidebar.button("Add Link Section"):
     # Store entry with custom link section number as the key
     if link_section_number:
         entry_data = {
@@ -53,13 +53,19 @@ def calculate_psv(aadt_value, per_hgvs, year, lanes):
     lane_details_lane1 = lane_details_lane2 = lane_details_lane3 = lane_details_lane4 = 0
     design_period = 0 if year == 0 else ((20 + 2025) - year)
     
-    # Calculate AADT_HGVS
+    # Calculate AADT of HGVS
     result1 = per_hgvs if per_hgvs >= 11 else 11
     AADT_HGVS = (result1 * (aadt_value / 100))
     total_projected_aadt_hgvs = (AADT_HGVS * (1 + 1.54 / 100) ** design_period)
     AADT_HGVS = round(AADT_HGVS)
     total_projected_aadt_hgvs = round(total_projected_aadt_hgvs)
-
+    
+st.subheader("Generic")
+# Generic Results
+st.write("AADT_HGVS:", AADT_HGVS)
+st.write("Design Period in years", design_period)
+st.write("Total Projected AADT HGVs", total_projected_aadt_hgvs)
+    
     # Lane percentage calculation
     if lanes == 1:
         lane1 = 100
