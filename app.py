@@ -102,30 +102,24 @@ def calculate_psv(aadt_value, per_hgvs, year, lanes):
 # Loop over each entry and calculate results
 for link_section_number, entry in st.session_state.entries.items():
     with st.expander(f"Link Section: {link_section_number}"):
-        AADT_HGVS, total_projected_aadt_hgvs, lane1, lane2, lane3, lane4, lane_details_lane1, lane_details_lane2, lane_details_lane3, lane_details_lane4 = calculate_psv(
-            entry['aadt_value'], entry['per_hgvs'], entry['year'], entry['lanes']
-        )
-
-        # Loop over each entry and calculate results
-for link_section_number, entry in st.session_state.entries.items():
-    with st.expander(f"Link Section: {link_section_number}"):
         # Calculate values
         AADT_HGVS, total_projected_aadt_hgvs, lane1, lane2, lane3, lane4, lane_details_lane1, lane_details_lane2, lane_details_lane3, lane_details_lane4, design_period = calculate_psv(
             entry['aadt_value'], entry['per_hgvs'], entry['year'], entry['lanes']
         )
 
-        st.subheader("Generic")
+        # Ensure subheaders appear properly
+        st.markdown("### Generic")
         st.write(f"AADT_HGVS: {AADT_HGVS}")
         st.write(f"Design Period in years: {design_period}")
         st.write(f"Total Projected AADT HGVs: {total_projected_aadt_hgvs}")
 
-        st.subheader("Percentage of CVs in Each Lane")
+        st.markdown("### Percentage of CVs in Each Lane")
         st.write(f"Lane1: {lane1}%")
         st.write(f"Lane2: {lane2}%")
         st.write(f"Lane3: {lane3}%")
         st.write(f"Lane4: {lane4}%")
 
-        st.subheader("Design Traffic")
+        st.markdown("### Design Traffic")
         st.write(f"Lane Details Lane1: {lane_details_lane1}")
         st.write(f"Lane Details Lane2: {lane_details_lane2}")
         st.write(f"Lane Details Lane3: {lane_details_lane3}")
@@ -139,26 +133,7 @@ for link_section_number, entry in st.session_state.entries.items():
             value4 = lane_details_lane2
             value5 = lane_details_lane3
 
-            def get_psv_for_lane(df, value1, value2, lane_value):
-                if lane_value == 0:
-                    return "NA"
-                range_column = None
-                for col in df.columns:
-                    if '-' in col:
-                        col_range = list(map(int, col.split('-')))
-                        if col_range[0] <= lane_value <= col_range[1]:
-                            range_column = col
-                            break
-                if range_column:
-                    filtered_df = df[(df['SiteCategory'] == value1) & (df['IL'] == value2)]
-                    if not filtered_df.empty:
-                        return filtered_df.iloc[0][range_column]
-                    else:
-                        return "No matching result found."
-                else:
-                    return "No matching range found for the given value."
-
-            st.subheader("Min. PSV Values at Each Lane")
+            st.markdown("### Min. PSV Values at Each Lane")
             st.write(f"PSV at Lane1: {get_psv_for_lane(df, value1, value2, value3)}")
             st.write(f"PSV at Lane2: {get_psv_for_lane(df, value1, value2, value4)}")
             st.write(f"PSV at Lane3: {get_psv_for_lane(df, value1, value2, value5)}")
