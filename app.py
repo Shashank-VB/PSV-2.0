@@ -60,13 +60,13 @@ def calculate_psv(aadt_value, per_hgvs, year, lanes):
     AADT_HGVS = round(AADT_HGVS)
     total_projected_aadt_hgvs = round(total_projected_aadt_hgvs)
     
-st.subheader("Generic")
+    st.subheader("Generic")
 # Generic Results
 st.write("AADT_HGVS:", AADT_HGVS)
 st.write("Design Period in years", design_period)
 st.write("Total Projected AADT OF HGVs", total_projected_aadt_hgvs)
-    
-    # Lane percentage calculation
+
+    # percentage of commercial vehicles in each lane
     if lanes == 1:
         lane1 = 100
         lane_details_lane1 = total_projected_aadt_hgvs
@@ -109,6 +109,18 @@ for link_section_number, entry in st.session_state.entries.items():
         AADT_HGVS, total_projected_aadt_hgvs, lane1, lane2, lane3, lane4, lane_details_lane1, lane_details_lane2, lane_details_lane3, lane_details_lane4 = calculate_psv(
             entry['aadt_value'], entry['per_hgvs'], entry['year'], entry['lanes']
         )
+st.subheader("Percentage of CV's in each lane")
+st.write("Lane1:", lane1)
+st.write("Lane2:", lane2)
+st.write("Lane3:", lane3)
+st.write("Lane4:", lane4)
+
+#Design Traffic
+st.subheader("Design Traffic")
+st.write("Lane Details Lane1:", lane_details_lane1)
+st.write("Lane Details Lane2:", lane_details_lane2)
+st.write("Lane Details Lane3:", lane_details_lane3)
+st.write("Lane Details Lane4:", lane_details_lane4)
 
         st.write(f"AADT_HGVS: {AADT_HGVS}")
         st.write(f"Total Projected AADT HGVs: {total_projected_aadt_hgvs}")
