@@ -99,35 +99,32 @@ def calculate_psv(aadt_value, per_hgvs, year, lanes):
 
     return AADT_HGVS, total_projected_aadt_hgvs, lane1, lane2, lane3, lane4, lane_details_lane1, lane_details_lane2, lane_details_lane3, lane_details_lane4
 
-# Loop over each entry and calculate results
+# Inside your loop for each link section
 for link_section_number, entry in st.session_state.entries.items():
     with st.expander(f"Link Section: {link_section_number}"):
-        # Debugging print to verify execution
-        st.write(f"### Debug: Inside Expander for {link_section_number}")
-
         # Calculate PSV values
         AADT_HGVS, total_projected_aadt_hgvs, lane1, lane2, lane3, lane4, lane_details_lane1, lane_details_lane2, lane_details_lane3, lane_details_lane4 = calculate_psv(
             entry['aadt_value'], entry['per_hgvs'], entry['year'], entry['lanes']
         )
 
-        # **Try `st.title()` as a test to force visibility**
-        st.title("🚧 PSV Calculation Results")  
+        # Title
+        st.title("🚧 PSV Calculation Results")
 
-        # **Generic Section**
-        st.write("## Generic Information")  # Larger Heading
+        # **Subheading in Output**
+        st.subheader("Generic Information")  # Subheading in the output area
         st.write(f"**AADT_HGVS:** {AADT_HGVS}")
         st.write(f"**Design Period in years:** {entry['year']}")
         st.write(f"**Total Projected AADT HGVs:** {total_projected_aadt_hgvs}")
 
         # **Lane Distribution**
-        st.write("## Percentage of CVs in Each Lane")  # Try H2 instead of subheader
+        st.subheader("Percentage of CVs in Each Lane")  # Another subheading
         st.write(f"**Lane1:** {lane1}%")
         st.write(f"**Lane2:** {lane2}%")
         st.write(f"**Lane3:** {lane3}%")
         st.write(f"**Lane4:** {lane4}%")
 
         # **Design Traffic**
-        st.write("## Design Traffic")
+        st.subheader("Design Traffic")  # Another subheading
         st.write(f"**Lane Details Lane1:** {lane_details_lane1}")
         st.write(f"**Lane Details Lane2:** {lane_details_lane2}")
         st.write(f"**Lane Details Lane3:** {lane_details_lane3}")
@@ -141,13 +138,10 @@ for link_section_number, entry in st.session_state.entries.items():
             value4 = lane_details_lane2
             value5 = lane_details_lane3
 
-            st.write("## Min. PSV Values at Each Lane")
+            st.subheader("Min. PSV Values at Each Lane")  # Subheading for PSV section
             st.write(f"**PSV at Lane1:** {get_psv_for_lane(df, value1, value2, value3)}")
             st.write(f"**PSV at Lane2:** {get_psv_for_lane(df, value1, value2, value4)}")
             st.write(f"**PSV at Lane3:** {get_psv_for_lane(df, value1, value2, value5)}")
         else:
             st.warning("Upload an Excel file to calculate PSV values.")
-
-# Debugging print at the end
-st.write("### Debug: End of Script")
 
