@@ -89,19 +89,19 @@ for link_section_number, entry in st.session_state.entries.items():
             entry['aadt_value'], entry['per_hgvs'], entry['year'], entry['lanes']
         )
         
-        st.subheader("Traffic Calculations")
-        st.write(f"AADT_HGVS: {AADT_HGVS}")
-        st.write(f"Total Projected AADT HGVs: {total_projected_aadt_hgvs}")
+        st.markdown("### Traffic Calculations")
+        st.write(f"**AADT_HGVS:** {AADT_HGVS}")
+        st.write(f"**Total Projected AADT HGVs:** {total_projected_aadt_hgvs}")
         
-        st.subheader("Lane Distribution (%)")
+        st.markdown("### Lane Distribution (%)")
         for i, lane in enumerate(lane_distribution, 1):
-            st.write(f"Lane{i}: {lane}%")
+            st.write(f"**Lane{i}:** {lane}%")
         
-        st.subheader("Lane Traffic Details")
+        st.markdown("### Lane Traffic Details")
         for i, lane in enumerate(lane_details, 1):
-            st.write(f"Lane Details Lane{i}: {lane}")
+            st.write(f"**Lane Details Lane{i}:** {lane}")
         
         if uploaded_file is not None:
-            st.subheader("PSV Values")
+            st.markdown("### PSV Values")
             for i, lane in enumerate(lane_details, 1):
-                st.write(f"PSV at Lane{i}: {get_psv_for_lane(df, entry['site_category'], entry['il_value'], lane)}")
+                st.write(f"**PSV at Lane{i}:** {get_psv_for_lane(df, entry['site_category'], entry['il_value'], lane)}")
